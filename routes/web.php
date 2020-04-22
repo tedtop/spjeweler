@@ -14,9 +14,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('tagger');
 });
 
-Route::get('/tagger/{id?}', 'Tagger@index');
+Route::get('/tagger/{id?}', 'Tagger@index')->name('tagger');
 Route::post('/tagger/next', 'Tagger@next');
 Route::post('/tagger/addTag', 'Tagger@addTag');

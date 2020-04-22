@@ -68,41 +68,13 @@
                         galleryId: {{ $id }},
                         newTag: newTag,
                     },
-                    success: function(result) {
+                    success: function (result) {
                         console.log(result);
                         $("#tags").show().append(`<span class="badge badge-secondary">${newTag}</span>\n`);
+                        $("#newTag").val(null);
                     }
                 });
-
-
-
             });
-            // $(function() {
-            //
-            //     var $form = $('#addTag');
-            //
-            //     $form.find('input[type="submit"]').click(function() {
-            //         alert("clicked");
-            //         $.ajax({
-            //             /* async: false,  this is deprecated*/
-            //             type: "POST",
-            //             url: "ajax.php",
-            //             data: {
-            //                 myString: $("#myString").val()
-            //             }
-            //         }).success(function(response) {
-            //             alert(response); //Got 'ok'
-            //             if(response == "ok") {
-            //                 /*  submit the form*/
-            //                 $form.submit();
-            //             } else {
-            //                 alert("Oh, string is wrong. Form Submit is cancelled.");
-            //             }
-            //         }); /* prevent default when submit button clicked*/
-            //         return false;
-            //
-            //     });
-            // });
         </script>
     </body>
 </html>
