@@ -3,37 +3,44 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="_token" content="{{csrf_token()}}">
 
         <title>Tagger</title>
 
         <!-- Styles -->
-        <link href="/css/app.css" rel="stylesheet">
+        <link href="{{asset('css/app.css')}}" rel="stylesheet" type="text/css">
         <style>
             /** { border: 1px solid red; }*/
+            .container { max-width: 900px; }
         </style>
     </head>
     <body>
         <div class="container">
-            <div class="row">
-                <div class="col-10 offset-1 my-5 text-center">
+            <div class="row my-4">
+                <div class="col-10 offset-1 text-center">
                     <img class="img-fluid" src="{{ $imgUrl }}">
                 </div>
             </div>
-            <div class="row">
+            <div class="row my-4">
+                <div class="col-10 offset-1">
+                    <h4 id="tags" style="display:none;">Tags:&nbsp;</h4>
+                </div>
+            </div>
+            <div class="row my-4">
                 <div class="col-6 offset-1">
-                    <form>
+                    <form id="addTag">
                         <div class="form-row">
                             <div class="col-8">
-                                <input type="text" class="form-control" placeholder="Add tag(s)">
+                                <input id="newTag" type="text" class="form-control" placeholder="Add tag(s)">
                             </div>
                             <div class="col">
-                                <button type="submit" class="btn btn-success">Add</button>
+                                <input class="btn btn-success" type="submit" value="Add">
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="col-4 text-right">
-                    <form action="{!! action('Tagger@next') !!}" method="POST">
+                    <form id="nextImage" action="{!! action('Tagger@next') !!}" method="POST">
                         @csrf
 
                         <input type="hidden" name="id" value="{{ $id }}">
@@ -42,5 +49,60 @@
                 </div>
             </div>
         </div>
+        <script type="text/javascript" src="{{asset('js/app.js')}}"></script>
+        <script>
+            $("#addTag").submit(function(event) {
+                event.preventDefault();
+
+                let newTag = $("#newTag").val();
+
+                jQuery.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+                    }
+                });
+                jQuery.ajax({
+                    url: "{{ url('tagger/addTag') }}",
+                    method: 'post',
+                    data: {
+                        galleryId: {{ $id }},
+                        newTag: newTag,
+                    },
+                    success: function(result) {
+                        console.log(result);
+                        $("#tags").show().append(`<span class="badge badge-secondary">${newTag}</span>\n`);
+                    }
+                });
+
+
+
+            });
+            // $(function() {
+            //
+            //     var $form = $('#addTag');
+            //
+            //     $form.find('input[type="submit"]').click(function() {
+            //         alert("clicked");
+            //         $.ajax({
+            //             /* async: false,  this is deprecated*/
+            //             type: "POST",
+            //             url: "ajax.php",
+            //             data: {
+            //                 myString: $("#myString").val()
+            //             }
+            //         }).success(function(response) {
+            //             alert(response); //Got 'ok'
+            //             if(response == "ok") {
+            //                 /*  submit the form*/
+            //                 $form.submit();
+            //             } else {
+            //                 alert("Oh, string is wrong. Form Submit is cancelled.");
+            //             }
+            //         }); /* prevent default when submit button clicked*/
+            //         return false;
+            //
+            //     });
+            // });
+        </script>
     </body>
 </html>

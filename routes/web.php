@@ -19,3 +19,4 @@ Route::get('/', function () {
 
 Route::get('/tagger/{id?}', 'Tagger@index');
 Route::post('/tagger/next', 'Tagger@next');
+Route::post('/tagger/addTag', 'Tagger@addTag');
