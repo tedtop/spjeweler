@@ -49,7 +49,7 @@
                 </div>
             </div>
         </div>
-        <script src="https://code.jquery.com/jquery-3.5.0.slim.min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
         <script src="https://twitter.github.io/typeahead.js/releases/latest/typeahead.bundle.min.js"></script>
         <script type="text/javascript">
             $("#addTag").submit(function(event) {
@@ -70,7 +70,7 @@
                         newTag: newTag,
                     },
                     success: function (result) {
-                        console.log(result);
+                        //console.log(result);
                         $("#tags").show().append(`<span class="badge badge-secondary">${newTag}</span>\n`);
                         $("#newTag").val(null);
                     }
@@ -78,38 +78,19 @@
             });
         </script>
         <script type="text/javascript">
-            var substringMatcher = function(strs) {
-                return function findMatches(q, cb) {
-                    var matches, substringRegex;
-
-                    // an array that will be populated with substring matches
-                    matches = [];
-
-                    // regex used to determine if a string contains the substring `q`
-                    substrRegex = new RegExp(q, 'i');
-
-                    // iterate through the pool of strings and for any string that
-                    // contains the substring `q`, add it to the `matches` array
-                    $.each(strs, function(i, str) {
-                        if (substrRegex.test(str)) {
-                            matches.push(str);
-                        }
-                    });
-
-                    cb(matches);
-                };
-            };
-
-            var tags = JSON.parse('{!! $existingTags !!}');
-
-            $('#addTag .typeahead').typeahead({
+            let path = "{{ url('tagger/autocomplete') }}";
+            $("#addTag .typeahead").typeahead({
                     hint: true,
                     highlight: true,
                     minLength: 1
                 },
                 {
-                    name: 'tags',
-                    source: substringMatcher(tags)
+                    source: function (query, process, process) {
+                        return $.get(path, { query: query }, function (data) {
+                            console.log(data);
+                            return process(data);
+                        });
+                    }
                 });
         </script>
     </body>

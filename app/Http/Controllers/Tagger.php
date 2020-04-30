@@ -24,20 +24,14 @@ class Tagger extends Controller
             : $img = Gallery::all()->whereNull('processed')->first();
 
         // Generate image url or fail if empty result from previous query, i.e no unprocessed images remain
-        $imgUrl = '';
-        if (!empty($img)) {
-            $imgUrl = self::IMG_URL_BASE . $img->image_url;
-        } else {
-            abort(404);
-        }
+        $imgUrl =  (!empty($img))
+            ? $imgUrl = self::IMG_URL_BASE . $img->image_url
+            : abort(404);
 
-        // Get all available tags for typeahead suggestions
-        $tags = Tag::distinct('tag')->pluck('tag');
-
+        // Render view
         return view('tagger', $data = [
             'id' => $img->id,
             'imgUrl' => $imgUrl,
-            'existingTags' => $tags,
         ]);
     }
 
@@ -87,11 +81,10 @@ class Tagger extends Controller
      */
     public function autocomplete(Request $request)
     {
-        $data = Tag::select('tag')
-            ->where('tag', 'LIKE', "%{$request->input('query')}%")
-            ->groupBy('tag')
-            ->get();
+        $tags = Tag::where('tag', 'LIKE', "%{$request->input('query')}%")
+            ->distinct('tag')
+            ->pluck('tag');
 
-        return response()->json($data);
+        return response()->json($tags);
     }
 }
