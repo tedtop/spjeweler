@@ -18,10 +18,12 @@ class Tagger extends Controller
      */
     function index($id = null)
     {
+        // Find an image by provided id or find next unprocessed image
         $img = isset($id)
             ? $img = Gallery::findOrFail($id)
             : $img = Gallery::all()->whereNull('processed')->first();
 
+        // Generate image url or fail if empty result from previous query, i.e no unprocessed images remain
         $imgUrl = '';
         if (!empty($img)) {
             $imgUrl = self::IMG_URL_BASE . $img->image_url;
@@ -29,7 +31,14 @@ class Tagger extends Controller
             abort(404);
         }
 
-        return view('tagger', $data = ['id' => $img->id, 'imgUrl' => $imgUrl]);
+        // Get all available tags for typeahead suggestions
+        $tags = Tag::distinct('tag')->pluck('tag');
+
+        return view('tagger', $data = [
+            'id' => $img->id,
+            'imgUrl' => $imgUrl,
+            'existingTags' => $tags,
+        ]);
     }
 
     /**
@@ -68,5 +77,21 @@ class Tagger extends Controller
             'galleryId' => $galleryId,
             'newTag' => $newTag,
         ], 200);
+    }
+
+    /**
+     * Get results for typeahead search
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function autocomplete(Request $request)
+    {
+        $data = Tag::select('tag')
+            ->where('tag', 'LIKE', "%{$request->input('query')}%")
+            ->groupBy('tag')
+            ->get();
+
+        return response()->json($data);
     }
 }

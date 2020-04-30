@@ -17,6 +17,8 @@ Route::get('/', function () {
     return redirect('tagger');
 });
 
-Route::get('/tagger/{id?}', 'Tagger@index')->name('tagger');
-Route::post('/tagger/next', 'Tagger@next');
+Route::get('/tagger/autocomplete', 'Tagger@autocomplete');
+Route::get('/tagger/{id?}', 'Tagger@index');
+
 Route::post('/tagger/addTag', 'Tagger@addTag');
+Route::post('/tagger/next', 'Tagger@next');

@@ -28,10 +28,10 @@
             </div>
             <div class="row my-4">
                 <div class="col-6 offset-1">
-                    <form id="addTag">
+                    <form id="addTag" autocomplete="off">
                         <div class="form-row">
                             <div class="col-8">
-                                <input id="newTag" type="text" class="form-control" placeholder="Add tag(s)">
+                                <input id="newTag" type="text" class="form-control typeahead" placeholder="Add tag(s)">
                             </div>
                             <div class="col">
                                 <input class="btn btn-success" type="submit" value="Add">
@@ -49,8 +49,9 @@
                 </div>
             </div>
         </div>
-        <script type="text/javascript" src="{{asset('js/app.js')}}"></script>
-        <script>
+        <script src="https://code.jquery.com/jquery-3.5.0.slim.min.js"></script>
+        <script src="https://twitter.github.io/typeahead.js/releases/latest/typeahead.bundle.min.js"></script>
+        <script type="text/javascript">
             $("#addTag").submit(function(event) {
                 event.preventDefault();
 
@@ -75,6 +76,41 @@
                     }
                 });
             });
+        </script>
+        <script type="text/javascript">
+            var substringMatcher = function(strs) {
+                return function findMatches(q, cb) {
+                    var matches, substringRegex;
+
+                    // an array that will be populated with substring matches
+                    matches = [];
+
+                    // regex used to determine if a string contains the substring `q`
+                    substrRegex = new RegExp(q, 'i');
+
+                    // iterate through the pool of strings and for any string that
+                    // contains the substring `q`, add it to the `matches` array
+                    $.each(strs, function(i, str) {
+                        if (substrRegex.test(str)) {
+                            matches.push(str);
+                        }
+                    });
+
+                    cb(matches);
+                };
+            };
+
+            var tags = JSON.parse('{!! $existingTags !!}');
+
+            $('#addTag .typeahead').typeahead({
+                    hint: true,
+                    highlight: true,
+                    minLength: 1
+                },
+                {
+                    name: 'tags',
+                    source: substringMatcher(tags)
+                });
         </script>
     </body>
 </html>
