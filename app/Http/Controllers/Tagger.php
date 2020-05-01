@@ -47,7 +47,7 @@ class Tagger extends Controller
         $id = $request->input('id');
         Gallery::setProcessed($id);
 
-        // Redirect to next random image
+        // Redirect to next unprocessed image
         return redirect()->action('Tagger@index');
     }
 
