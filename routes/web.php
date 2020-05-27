@@ -21,4 +21,6 @@ Route::get('/tagger/autocomplete', 'Tagger@autocomplete');
 Route::get('/tagger/{id?}', 'Tagger@index');
 
 Route::post('/tagger/addTag', 'Tagger@addTag');
+Route::delete('tagger/deleteTag', 'Tagger@deleteTag');
+
 Route::post('/tagger/next', 'Tagger@next');

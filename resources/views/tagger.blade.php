@@ -3,14 +3,14 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="_token" content="{{csrf_token()}}">
+        <meta name="_token" content="{{ csrf_token() }}">
 
         <title>Tagger</title>
 
         <!-- Styles -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
         <style>
-            .col, div[class^="col-"] { border: 1px solid red; }
+            /*.col, div[class^="col-"] { border: 1px solid red; }*/
             .container { max-width: 900px; }
 
             .tt-query {
@@ -81,45 +81,72 @@
                     <form id="nextImage" action="{!! action('Tagger@next') !!}" method="POST">
                         @csrf
 
-                        <input type="hidden" name="id" value="{{ $id }}">
+                        <input type="hidden" name="id" value="{{ $galleryId }}">
                         <input class="btn btn-danger" type="submit" value="Next">
                     </form>
                 </div>
             </div>
         </div>
         <script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
+        <script type="text/javascript">
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+                }
+            });
+        </script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
         <script src="https://twitter.github.io/typeahead.js/releases/latest/typeahead.bundle.min.js"></script>
         <script type="text/javascript">
             let addTagPath = "{{ url('tagger/addTag') }}";
+            let delTagPath = "{{ url('tagger/deleteTag') }}";
+
             $("#addTag").submit(function(event) {
                 event.preventDefault();
 
                 let newTag = $("#newTag").val();
 
-                jQuery.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
-                    }
-                });
-                jQuery.ajax({
+                $.ajax({
                     url: addTagPath,
                     method: 'post',
                     data: {
-                        galleryId: {{ $id }},
+                        galleryId: {{ $galleryId }},
                         newTag: newTag,
                     },
                     success: function (result) {
                         console.log(result);
-                        $("#tags").show().append(`<span class="badge badge-secondary">${newTag}</span>\n`);
+                        $("#tags")
+                            .show()
+                            .append(
+                                '<span class="badge badge-secondary">' + newTag +
+                                `<button id="${result.last_insert_id}" class="delete-tag badge badge-pill badge-danger ml-2">X</button></span>\n`);
                         $("#newTag").val(null);
+                    },
+                    error: function(xhr) {
+                        console.log(xhr.responseText);
+                    }
+                });
+            });
+            $("#tags").on('click', 'button.delete-tag', function(event) {
+                $.ajax({
+                    url: delTagPath,
+                    method: 'delete',
+                    data: {
+                        id: event.target.id,
+                    },
+                    success: function (result) {
+                        console.log(result);
+                        $(event.target).parent().hide();
+                    },
+                    error: function(xhr) {
+                        console.log(xhr.responseText);
                     }
                 });
             });
         </script>
         <script type="text/javascript">
             let typeaheadPath = "{{ url('tagger/autocomplete') }}";
-            $("#addTag .typeahead").typeahead({
+            $('#addTag .typeahead').typeahead({
                     hint: true,
                     highlight: true,
                     minLength: 1

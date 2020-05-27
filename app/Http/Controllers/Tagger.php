@@ -30,7 +30,7 @@ class Tagger extends Controller
 
         // Render view
         return view('tagger', $data = [
-            'id' => $img->id,
+            'galleryId' => $img->id,
             'imgUrl' => $imgUrl,
         ]);
     }
@@ -70,6 +70,7 @@ class Tagger extends Controller
         return response()->json([
             'galleryId' => $galleryId,
             'newTag' => $newTag,
+            'last_insert_id' => $tag->id
         ], 200);
     }
 
@@ -86,5 +87,22 @@ class Tagger extends Controller
             ->pluck('tag');
 
         return response()->json($tags);
+    }
+
+    /**
+     * Delete a tag
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    function deleteTag(Request $request)
+    {
+        $id = $request->id;
+
+        $result = Tag::destroy($id);
+
+        return response()->json([
+            'Tag ' . $id . ' deleted'
+        ], 200);
     }
 }
